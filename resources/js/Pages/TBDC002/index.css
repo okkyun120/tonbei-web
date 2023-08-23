@@ -1,0 +1,12 @@
+.submit-button {
+  /* 通常のスタイル */
+  background-color: #1890ff;
+  color: white;
+
+  /* フォーカス時のスタイル */
+  &:focus,
+  &:active {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2); /* カスタムフォーカススタイル */
+  }
+}
