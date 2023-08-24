@@ -18,7 +18,9 @@ class ExportServiceBisDecision
     {
 
         define('LINE_STR_MAX', 35);
-        define('PAGE_LINE_MAX', 45);
+        define('LINE_STR_MAX2', 50);
+        define('PAGE_LINE_MAX', 50);    // 45
+        define('PAGE_LINE_MAX2', 60);
 
         // モデルからデータ取得
         $sqlBaseData = TBPC004Model::show($id);                // メイン情報
@@ -55,7 +57,6 @@ class ExportServiceBisDecision
         // 書込用バッファ初期化
         $write_buff = "";
 
-
         //　催事名
         $event_title_buff = "1. 催事名　" . $sqlBaseData[0]->event_name;
 
@@ -65,24 +66,48 @@ class ExportServiceBisDecision
         //  行数カウントアップ
         $event_title_buff .= "\n\n";
 
-        $write_line_cnt = NumberService::calculateNumberOfLines($event_title_buff, LINE_STR_MAX);
+        if (!$first_page_write) {
+            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $event_title_buff, LINE_STR_MAX);
+        }
+        else {
+            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $event_title_buff, LINE_STR_MAX2);
+        }
         \Debugbar::log('$write_line_cnt : ' . $write_line_cnt);
 
         // ページ最大値を超えているかチェック
-        if ($write_line_cnt > PAGE_LINE_MAX) {
-            if (!$first_page_write)
-            $worksheet->setCellValue('F8', $write_buff );
+        if (!$first_page_write) {
+            if ($write_line_cnt > PAGE_LINE_MAX) {
+                $worksheet->setCellValue('F8', $write_buff );
 
-            $write_buff = $event_title_buff;
-            $first_page_write = true;
-        }
-        else {
+                // 書込み用バッファクリア
+                $write_buff = "";
+            
+                // 書込み行数再設定
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $event_title_buff, LINE_STR_MAX2);
+
+                // １ページ目書込みフラグON
+                $first_page_write = true;
+            }
+
+            // バッファ格納
             $write_buff .= $event_title_buff;
         }
-        
+        else {
+            if ($write_line_cnt > PAGE_LINE_MAX2) {
+                $worksheet->setCellValue('F8', $write_buff );
+
+                // 書込み用バッファクリア
+                $write_buff = "";
+            
+                // 書込み行数再設定
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $event_title_buff, LINE_STR_MAX2);
+            }
+            // バッファ格納
+            $write_buff .= $event_title_buff;
+        }
+      
         $date_buff = "";                    // 日時出力用バッファ
         $venue_buff = "";                   // 会場出力用バッファ
-
         if (count($sqlVenueData) > 0 ) {
             $item_no++;
             //　日時
@@ -107,24 +132,47 @@ class ExportServiceBisDecision
 
             $date_buff .= "\n\n";
 
-            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $date_buff, LINE_STR_MAX);
-
-            // ページ最大値を超えているかチェック
-            if ($write_line_cnt > PAGE_LINE_MAX) {
-                // $write_buffを出力
-                if (!$first_page_write)
-                    $worksheet->setCellValue('F8', $write_buff );
-
-                    $write_buff = $date_buff;
-                    $first_page_write = true;
+            if (!$first_page_write) {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $date_buff, LINE_STR_MAX);
             }
             else {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $date_buff, LINE_STR_MAX2);
+            }
+
+            if (!$first_page_write) {
+                if ($write_line_cnt > PAGE_LINE_MAX) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $date_buff, LINE_STR_MAX2);
+        
+                    // １ページ目書込みフラグON
+                    $first_page_write = true;
+                }
+
+                // バッファ格納
+                $write_buff .= $date_buff;
+            }
+            else {
+                if ($write_line_cnt > PAGE_LINE_MAX2) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $date_buff, LINE_STR_MAX2);    
+                }
+
+                // バッファ格納
                 $write_buff .= $date_buff;
             }
 
-
             $item_no++;
-
+            
             //　会場
             $data_cnt = 0;
 
@@ -141,22 +189,45 @@ class ExportServiceBisDecision
             }
             $venue_buff .= "\n\n";
 
-            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $venue_buff, LINE_STR_MAX);
-
-            // ページ最大値を超えているかチェック
-            if ($write_line_cnt > PAGE_LINE_MAX) {
-                if (!$first_page_write)
-                    $worksheet->setCellValue('F8', $write_buff );
-
-                $write_buff = $venue_buff;
-                $first_page_write = true;
+            if (!$first_page_write) {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $venue_buff, LINE_STR_MAX);
             }
             else {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $venue_buff, LINE_STR_MAX2);
+            }
+    
+            if (!$first_page_write) {
+                if ($write_line_cnt > PAGE_LINE_MAX) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $venue_buff, LINE_STR_MAX2);
+        
+                    // １ページ目書込みフラグON
+                    $first_page_write = true;
+                }
+
+                // バッファ格納
                 $write_buff .= $venue_buff;
             }
+            else {
+                if ($write_line_cnt > PAGE_LINE_MAX2) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $venue_buff, LINE_STR_MAX2);    
+                }
 
+                // バッファ格納
+                $write_buff .= $venue_buff;
+            }
         }
-
 
         $plan_design_buff = "";
         if (!empty($sqlBaseData[0]->plan_design)) {
@@ -167,17 +238,43 @@ class ExportServiceBisDecision
 
             $plan_design_buff .= "\n\n";
 
-            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $plan_design_buff, LINE_STR_MAX);
-
-            // ページ最大値を超えているかチェック
-            if ($write_line_cnt > PAGE_LINE_MAX) {
-                if (!$first_page_write)
-                    $worksheet->setCellValue('F8', $write_buff );
-
-                    $write_buff = $plan_design_buff;
-                    $first_page_write = true;
+            if (!$first_page_write) {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $plan_design_buff, LINE_STR_MAX);
             }
             else {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $plan_design_buff, LINE_STR_MAX2);
+            }
+    
+            // ページ最大値を超えているかチェック
+            if (!$first_page_write) {
+                if ($write_line_cnt > PAGE_LINE_MAX) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $plan_design_buff, LINE_STR_MAX2);
+        
+                    // １ページ目書込みフラグON
+                    $first_page_write = true;
+                }
+
+                // バッファ格納
+                $write_buff .= $plan_design_buff;
+            }
+            else {
+                if ($write_line_cnt > PAGE_LINE_MAX2) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $plan_design_buff, LINE_STR_MAX2);    
+                }
+
+                // バッファ格納
                 $write_buff .= $plan_design_buff;
             }
         }
@@ -189,7 +286,7 @@ class ExportServiceBisDecision
             $data_cnt = 0;
 
             $item_no++;
-            $data_buff = $item_no . ". 出資比率　" ;
+            $investment_buff = $item_no . ". 出資比率　" ;
 
             foreach ($sqlInvestmentData as $data) {
                 if ($data->disp_flg) {
@@ -201,17 +298,43 @@ class ExportServiceBisDecision
             }
             $investment_buff .= "\n\n";
 
-            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $investment_buff, LINE_STR_MAX);
-
-            // ページ最大値を超えているかチェック
-            if ($write_line_cnt > PAGE_LINE_MAX) {
-                if (!$first_page_write)
-                    $worksheet->setCellValue('F8', $write_buff );
-
-                $write_buff = $investment_buff;
-                $first_page_write = true;
+            if (!$first_page_write) {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $investment_buff, LINE_STR_MAX);
             }
             else {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $investment_buff, LINE_STR_MAX2);
+            }
+    
+            // ページ最大値を超えているかチェック
+            if (!$first_page_write) {
+                if ($write_line_cnt > PAGE_LINE_MAX) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $investment_buff, LINE_STR_MAX2);
+        
+                    // １ページ目書込みフラグON
+                    $first_page_write = true;
+                }
+
+                // バッファ格納
+                $write_buff .= $investment_buff;
+            }
+            else {
+                if ($write_line_cnt > PAGE_LINE_MAX2) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $investment_buff, LINE_STR_MAX2);    
+                }
+
+                // バッファ格納
                 $write_buff .= $investment_buff;
             }
         }
@@ -233,17 +356,44 @@ class ExportServiceBisDecision
                     $relation_buff .= "\n\n";
                 }
             }
-            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $relation_buff, LINE_STR_MAX);
 
-            // ページ最大値を超えているかチェック
-            if ($write_line_cnt > PAGE_LINE_MAX) {
-                if (!$first_page_write)
-                    $worksheet->setCellValue('F8', $write_buff );
-
-                    $write_buff = $relation_buff;
-                    $first_page_write = true;
+            if (!$first_page_write) {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $relation_buff, LINE_STR_MAX);
             }
             else {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $relation_buff, LINE_STR_MAX2);
+            }
+    
+            // ページ最大値を超えているかチェック
+            if (!$first_page_write) {
+                if ($write_line_cnt > PAGE_LINE_MAX) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $relation_buff, LINE_STR_MAX2);
+        
+                    // １ページ目書込みフラグON
+                    $first_page_write = true;
+                }
+
+                // バッファ格納
+                $write_buff .= $relation_buff;
+            }
+            else {
+                if ($write_line_cnt > PAGE_LINE_MAX2) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $relation_buff, LINE_STR_MAX2);    
+                }
+
+                // バッファ格納
                 $write_buff .= $relation_buff;
             }
 
@@ -258,20 +408,45 @@ class ExportServiceBisDecision
             $release_dt_buff = $item_no . ". 一般発売日" . $sqlBaseData[0]->release_day;
             $release_dt_buff .= "\n\n";
 
-            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $release_dt_buff, LINE_STR_MAX);
-
-            // ページ最大値を超えているかチェック
-            if ($write_line_cnt > PAGE_LINE_MAX) {
-                if (!$first_page_write)
-                    $worksheet->setCellValue('F8', $write_buff );
-
-                $write_buff = $release_dt_buff;
-                $first_page_write = true;
+            if (!$first_page_write) {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $release_dt_buff, LINE_STR_MAX);
             }
             else {
-                $write_buff .= $release_dt_buff;
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $release_dt_buff, LINE_STR_MAX2);
             }
 
+            // ページ最大値を超えているかチェック
+            if (!$first_page_write) {
+                if ($write_line_cnt > PAGE_LINE_MAX) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $release_dt_buff, LINE_STR_MAX2);
+        
+                    // １ページ目書込みフラグON
+                    $first_page_write = true;
+                }
+
+                // バッファ格納
+                $write_buff .= $release_dt_buff;
+            }
+            else {
+                if ($write_line_cnt > PAGE_LINE_MAX2) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $release_dt_buff, LINE_STR_MAX2);    
+                }
+
+                // バッファ格納
+                $write_buff .= $release_dt_buff;
+            }
         }
 
         //　チケット情報
@@ -304,17 +479,43 @@ class ExportServiceBisDecision
                 }
             }
 
-            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $ticket_buff, LINE_STR_MAX);
-
-            // ページ最大値を超えているかチェック
-            if ($write_line_cnt > PAGE_LINE_MAX) {
-                if (!$first_page_write)
-                    $worksheet->setCellValue('F8', $write_buff );
-
-                    $write_buff = $ticket_buff;
-                    $first_page_write = true;
+            if (!$first_page_write) {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $ticket_buff, LINE_STR_MAX);
             }
             else {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $ticket_buff, LINE_STR_MAX2);
+            }
+    
+            // ページ最大値を超えているかチェック
+            if (!$first_page_write) {
+                if ($write_line_cnt > PAGE_LINE_MAX) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $ticket_buff, LINE_STR_MAX2);
+        
+                    // １ページ目書込みフラグON
+                    $first_page_write = true;
+                }
+
+                // バッファ格納
+                $write_buff .= $ticket_buff;
+            }
+            else {
+                if ($write_line_cnt > PAGE_LINE_MAX2) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $ticket_buff, LINE_STR_MAX2);    
+                }
+
+                // バッファ格納
                 $write_buff .= $ticket_buff;
             }
         }
@@ -328,26 +529,50 @@ class ExportServiceBisDecision
             $plan_content_buff = $item_no . ". 内容　" . $sqlBaseData[0]->plan_content ;
 
             $plan_content_buff .= "\n\n";
+
+            if (!$first_page_write) {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $plan_content_buff, LINE_STR_MAX);
+            }
+            else {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $plan_content_buff, LINE_STR_MAX2);
+            }
+    
+            // ページ最大値を超えているかチェック
+            if (!$first_page_write) {
+                if ($write_line_cnt > PAGE_LINE_MAX) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $plan_content_buff, LINE_STR_MAX2);
+        
+                    // １ページ目書込みフラグON
+                    $first_page_write = true;
+                }
+    
+                // バッファ格納
+                $write_buff .= $plan_content_buff;
+            }
+            else {
+                if ($write_line_cnt > PAGE_LINE_MAX2) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $plan_content_buff, LINE_STR_MAX2);    
+                }
+    
+                // バッファ格納
+                $write_buff .= $plan_content_buff;
+            }
         }
 
-        $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $plan_content_buff, LINE_STR_MAX);
 
-        // ページ最大値を超えているかチェック
-        if ($write_line_cnt > PAGE_LINE_MAX) {
-            if (!$first_page_write)
-                $worksheet->setCellValue('F8', $write_buff );
-
-            $write_buff = $plan_content_buff;
-
-            $first_page_write = true;
-
-        }
-        else {
-            $write_buff .= $plan_content_buff;
-        }
-
-
-        //　脚本・演出
+            //　脚本・演出
         $scenario_buff = "";
         if (!empty($sqlBaseData[0]->scenario)) {
             $item_no++;
@@ -356,18 +581,43 @@ class ExportServiceBisDecision
 
             $scenario_buff .= "\n\n";
 
-            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $scenario_buff, LINE_STR_MAX);
-
-            // ページ最大値を超えているかチェック
-            if ($write_line_cnt > PAGE_LINE_MAX) {
-                if (!$first_page_write)
-                    $worksheet->setCellValue('F8', $write_buff );
-    
-                $write_buff = $scenario_buff;
-    
-                $first_page_write = true;  
+            if (!$first_page_write) {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $scenario_buff, LINE_STR_MAX);
             }
             else {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $scenario_buff, LINE_STR_MAX2);
+            }
+    
+            // ページ最大値を超えているかチェック
+            if (!$first_page_write) {
+                if ($write_line_cnt > PAGE_LINE_MAX) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $scenario_buff, LINE_STR_MAX2);
+        
+                    // １ページ目書込みフラグON
+                    $first_page_write = true;
+                }
+    
+                // バッファ格納
+                $write_buff .= $scenario_buff;
+            }
+            else {
+                if ($write_line_cnt > PAGE_LINE_MAX2) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $scenario_buff, LINE_STR_MAX2);    
+                }
+    
+                // バッファ格納
                 $write_buff .= $scenario_buff;
             }
         }
@@ -381,18 +631,43 @@ class ExportServiceBisDecision
 
             $performer_buff .= "\n\n";
 
-            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $performer_buff, LINE_STR_MAX);
-
-            // ページ最大値を超えているかチェック
-            if ($write_line_cnt > PAGE_LINE_MAX) {
-                if (!$first_page_write)
-                    $worksheet->setCellValue('F8', $write_buff );
-    
-                $write_buff = $performer_buff;
-    
-                $first_page_write = true;  
+            if (!$first_page_write) {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $performer_buff, LINE_STR_MAX);
             }
             else {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $performer_buff, LINE_STR_MAX2);
+            }
+    
+            // ページ最大値を超えているかチェック
+            if (!$first_page_write) {
+                if ($write_line_cnt > PAGE_LINE_MAX) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $performer_buff, LINE_STR_MAX2);
+        
+                    // １ページ目書込みフラグON
+                    $first_page_write = true;
+                }
+    
+                // バッファ格納
+                $write_buff .= $performer_buff;
+            }
+            else {
+                if ($write_line_cnt > PAGE_LINE_MAX2) {
+                    $worksheet->setCellValue('F8', $write_buff );
+    
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $performer_buff, LINE_STR_MAX2);    
+                }
+    
+                // バッファ格納
                 $write_buff .= $performer_buff;
             }
         }
@@ -418,18 +693,43 @@ class ExportServiceBisDecision
         $event_balance_buff .= $sqlBaseData[0]->decision_total_outgo . "円\n\n";
         $event_balance_buff .= "\n\n";
 
-        $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $event_balance_buff, LINE_STR_MAX);
-
-        // ページ最大値を超えているかチェック
-        if ($write_line_cnt > PAGE_LINE_MAX) {
-            if (!$first_page_write)
-                $worksheet->setCellValue('F8', $write_buff );
-
-            $write_buff = $event_balance_buff;
-
-            $first_page_write = true;  
+        if (!$first_page_write) {
+            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $event_balance_buff, LINE_STR_MAX);
         }
         else {
+            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $event_balance_buff, LINE_STR_MAX2);
+        }
+
+        // ページ最大値を超えているかチェック
+        if (!$first_page_write) {
+            if ($write_line_cnt > PAGE_LINE_MAX) {
+                $worksheet->setCellValue('F8', $write_buff );
+
+                // 書込み用バッファクリア
+                $write_buff = "";
+            
+                // 書込み行数再設定
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $event_balance_buff, LINE_STR_MAX2);
+    
+                // １ページ目書込みフラグON
+                $first_page_write = true;
+            }
+
+            // バッファ格納
+            $write_buff .= $event_balance_buff;
+        }
+        else {
+            if ($write_line_cnt > PAGE_LINE_MAX2) {
+                $worksheet->setCellValue('F8', $write_buff );
+
+                // 書込み用バッファクリア
+                $write_buff = "";
+            
+                // 書込み行数再設定
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $event_balance_buff, LINE_STR_MAX2);    
+            }
+
+            // バッファ格納
             $write_buff .= $event_balance_buff;
         }
 
@@ -454,20 +754,46 @@ class ExportServiceBisDecision
         $single_balance_buff .= $sqlBaseData[0]->investment_balance . "円\n\n";
         $single_balance_buff .= "\n\n";
 
-        $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $single_balance_buff, LINE_STR_MAX);
-
-        // ページ最大値を超えているかチェック
-        if ($write_line_cnt > PAGE_LINE_MAX) {
-            if (!$first_page_write)
-                $worksheet->setCellValue('F8', $write_buff );
-
-            $write_buff = $single_balance_buff;
-
-            $first_page_write = true;  
+        if (!$first_page_write) {
+            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $single_balance_buff, LINE_STR_MAX);
         }
         else {
+            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $single_balance_buff, LINE_STR_MAX2);
+        }
+
+        // ページ最大値を超えているかチェック
+        if (!$first_page_write) {
+            if ($write_line_cnt > PAGE_LINE_MAX) {
+                $worksheet->setCellValue('F8', $write_buff );
+
+                // 書込み用バッファクリア
+                $write_buff = "";
+            
+                // 書込み行数再設定
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $single_balance_buff, LINE_STR_MAX2);
+    
+                // １ページ目書込みフラグON
+                $first_page_write = true;
+            }
+
+            // バッファ格納
             $write_buff .= $single_balance_buff;
         }
+        else {
+            if ($write_line_cnt > PAGE_LINE_MAX2) {
+                $worksheet->setCellValue('F8', $write_buff );
+
+                // 書込み用バッファクリア
+                $write_buff = "";
+            
+                // 書込み行数再設定
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $single_balance_buff, LINE_STR_MAX2);    
+            }
+
+            // バッファ格納
+            $write_buff .= $single_balance_buff;
+        }
+
 
         // 決裁用備考
         $decision_remaind_buff = "";
@@ -478,18 +804,43 @@ class ExportServiceBisDecision
 
             $decision_remaind_buff .= "\n\n";
 
-            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $decision_remaind_buff, LINE_STR_MAX);
-
-            // ページ最大値を超えているかチェック
-            if ($write_line_cnt > PAGE_LINE_MAX) {
-                if (!$first_page_write)
-                    $worksheet->setCellValue('F8', $write_buff );
-    
-                $write_buff = $decision_remaind_buff;
-    
-                $first_page_write = true;  
+            if (!$first_page_write) {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $decision_remaind_buff, LINE_STR_MAX);
             }
             else {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $decision_remaind_buff, LINE_STR_MAX2);
+            }
+    
+            // ページ最大値を超えているかチェック
+            if (!$first_page_write) {
+                if ($write_line_cnt > PAGE_LINE_MAX) {
+                    $worksheet->setCellValue('F8', $write_buff );
+
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $decision_remaind_buff, LINE_STR_MAX2);
+        
+                    // １ページ目書込みフラグON
+                    $first_page_write = true;
+                }
+
+                // バッファ格納
+                $write_buff .= $decision_remaind_buff;
+            }
+            else {
+                if ($write_line_cnt > PAGE_LINE_MAX2) {
+                    $worksheet->setCellValue('F8', $write_buff );
+
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $decision_remaind_buff, LINE_STR_MAX2);    
+                }
+
+                // バッファ格納
                 $write_buff .= $decision_remaind_buff;
             }
         }
@@ -503,18 +854,43 @@ class ExportServiceBisDecision
 
             $attach_doc_buff .= "\n\n";
 
-            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $attach_doc_buff, LINE_STR_MAX);
-
-            // ページ最大値を超えているかチェック
-            if ($write_line_cnt > PAGE_LINE_MAX) {
-                if (!$first_page_write)
-                    $worksheet->setCellValue('F8', $write_buff );
-    
-                $write_buff = $attach_doc_buff;
-    
-                $first_page_write = true;  
+            if (!$first_page_write) {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $attach_doc_buff, LINE_STR_MAX);
             }
             else {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $attach_doc_buff, LINE_STR_MAX2);
+            }
+    
+            // ページ最大値を超えているかチェック
+            if (!$first_page_write) {
+                if ($write_line_cnt > PAGE_LINE_MAX) {
+                    $worksheet->setCellValue('F8', $write_buff );
+
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $attach_doc_buff, LINE_STR_MAX2);
+        
+                    // １ページ目書込みフラグON
+                    $first_page_write = true;
+                }
+
+                // バッファ格納
+                $write_buff .= $attach_doc_buff;
+            }
+            else {
+                if ($write_line_cnt > PAGE_LINE_MAX2) {
+                    $worksheet->setCellValue('F8', $write_buff );
+
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $attach_doc_buff, LINE_STR_MAX2);    
+                }
+
+                // バッファ格納
                 $write_buff .= $attach_doc_buff;
             }
         }
@@ -529,22 +905,46 @@ class ExportServiceBisDecision
 
             $staff_name_buff .= "\n\n";
 
-            $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $staff_name_buff, LINE_STR_MAX);
-
-            // ページ最大値を超えているかチェック
-            if ($write_line_cnt > PAGE_LINE_MAX) {
-                if (!$first_page_write)
-                    $worksheet->setCellValue('F8', $write_buff );
-    
-                $write_buff = $staff_name_buff;
-    
-                $first_page_write = true;  
+            if (!$first_page_write) {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $staff_name_buff, LINE_STR_MAX);
             }
             else {
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $staff_name_buff, LINE_STR_MAX2);
+            }
+    
+            // ページ最大値を超えているかチェック
+            if (!$first_page_write) {
+                if ($write_line_cnt > PAGE_LINE_MAX) {
+                    $worksheet->setCellValue('F8', $write_buff );
+
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $staff_name_buff, LINE_STR_MAX2);
+        
+                    // １ページ目書込みフラグON
+                    $first_page_write = true;
+                }
+
+                // バッファ格納
+                $write_buff .= $staff_name_buff;
+            }
+            else {
+                if ($write_line_cnt > PAGE_LINE_MAX2) {
+                    $worksheet->setCellValue('F8', $write_buff );
+
+                    // 書込み用バッファクリア
+                    $write_buff = "";
+                
+                    // 書込み行数再設定
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $staff_name_buff, LINE_STR_MAX2);    
+                }
+
+                // バッファ格納
                 $write_buff .= $staff_name_buff;
             }
         }
-
 
         $write_buff .= "\n以上";
 

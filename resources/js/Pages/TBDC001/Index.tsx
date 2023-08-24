@@ -921,7 +921,7 @@ export default function Index( props: any ) {
                       <Row>
                           <Col span={2} offset={18}>
                           <Form.Item >
-                              <Button style={{backgroundColor: "blue"}} type="primary" htmlType="submit">
+                              <Button style={{backgroundColor: '#00BFFF'}} type="primary" htmlType="submit">
                                 保存   
                               </Button>
                               </Form.Item>

@@ -1136,6 +1136,21 @@ export default function Index( props: any ) {
 
   type FieldType = {
     event_name?: string;
+    event_kana?: string;
+    performer1?: string; 
+    performer2?: string; 
+    scenario?: string; 
+    type_cd?: number;
+    genre_cd?: number;
+    plan_design?: string; 
+    plan_background?: string; 
+    plan_content?: string; 
+    attach_doc?: string; 
+    remind?: string; 
+    decision_remind?: string; 
+    tv_asahi_ticket: string;
+    sponsorship: string; 
+    pr: string; 
   };
   
 
@@ -1164,6 +1179,22 @@ export default function Index( props: any ) {
                     <Layout >
                     <Form
                     name="event_form"
+                    initialValues={{
+                      event_name: basicInfoDatas.event_name, 
+                      event_kana: basicInfoDatas.event_kana, 
+                      performer1: basicInfoDatas.performer1, 
+                      performer2: basicInfoDatas.performer2, 
+                      scenario: basicInfoDatas.scenario, 
+                      plan_design: basicInfoDatas.plan_design, 
+                      plan_background: basicInfoDatas.plan_background, 
+                      plan_content: basicInfoDatas.plan_content, 
+                      attach_doc: basicInfoDatas.attach_doc, 
+                      remind: basicInfoDatas.remind, 
+                      decision_remind: basicInfoDatas.decision_remind, 
+                      tv_asahi_ticket: basicInfoDatas.tv_asahi_ticket, 
+                      sponsorship: basicInfoDatas.sponsorship, 
+                      pr: basicInfoDatas.pr, 
+                    }}
                     onFinish={onFinish}
                     onFinishFailed={onFinishFailed}
                     >
@@ -1173,7 +1204,7 @@ export default function Index( props: any ) {
                     <div style={{ padding: '20px 20px', width: '100%'}}>
                       <Row>
                           <Col span={2} offset={18}>
-                              <Button onClick={handleSaveBtnClick} disabled={isSaveBtnDisabled}>
+                              <Button style={{backgroundColor: '#00BFFF'}} type="primary" htmlType="submit">
                                 保存   
                               </Button>
                            
@@ -1211,126 +1242,142 @@ export default function Index( props: any ) {
                         name="event_name"
                         placeholder="公演名は150文字以内で入力してください。" 
                         maxLength={150} 
-                        defaultValue={basicInfoDatas['event_name']}
-                        onChange={handleTextAreaChange}/>
+                        onChange={handleTextAreaChange}
+                        />
                     </Form.Item>
-                    <Form.Item label="公演名カナ">
+                    <Form.Item<FieldType>
+                      label="公演名カナ"
+                      name="event_kana">
                       <TextArea rows={2} 
                         name="event_kana"
                         placeholder="公演名カナは150文字以内で入力してください。" 
                         maxLength={150} 
-                        defaultValue={basicInfoDatas['event_kana']} 
                         onChange={handleTextAreaChange}/>
                     </Form.Item>
-                    <Form.Item label="出演者（公開）">
+                    <Form.Item<FieldType>
+                      label="出演者（公開）"
+                      name="performer1">
                       <TextArea rows={2} 
                           name="performer1"
                           placeholder="出演者（公開）は300文字以内で入力してください。" 
                           maxLength={300} 
-                          defaultValue={basicInfoDatas['performer1']} 
                           onChange={handleTextAreaChange}/>
                     </Form.Item>
-                    <Form.Item label="出演者（非公開）">
+                    <Form.Item<FieldType>
+                      label="出演者（非公開）"
+                      name="performer2">
                       <TextArea rows={2} 
                           name="performer2"
                           placeholder="出演者（非公開）は300文字以内で入力してください。" 
                           maxLength={300} 
-                          defaultValue={basicInfoDatas['performer2']} 
                           onChange={handleTextAreaChange}/>
                     </Form.Item>
-                    <Form.Item label="脚本・演出">
+                    <Form.Item<FieldType>
+                      label="脚本・演出"
+                      name="scenario">
                       <TextArea rows={2} 
                           name="scenario"
                           placeholder="脚本・演出は100文字以内で入力してください。" 
                           maxLength={100} 
-                          defaultValue={basicInfoDatas['scenario']} 
                           onChange={handleTextAreaChange}/>
                     </Form.Item>
 
-                    <Form.Item label="実施形態">
+                    <Form.Item<FieldType>
+                      label="実施形態"
+                      name="type_cd"
+                      >
                       <CustomTypeSelect options={props.selectItemType} defaultValue={basicInfoDatas['type_cd']} onChange={handleChangeType} />                  
                     </Form.Item>
 
-                    <Form.Item label="ジャンル">
+                    <Form.Item<FieldType>
+                      label="ジャンル"
+                      name="genre_cd"
+                      >
                       <CustomGenreSelect options={props.selectItemGenre} defaultValue={basicInfoDatas['genre_cd']} onChange={handleChangeGenre} />                  
                     </Form.Item>
 
-                    <Form.Item label="企画立案元"
-                      rules={[
-                        {required: true, message: "企画立案元を入力してください。"},
-                      ]}>
+                    <Form.Item<FieldType>
+                      label="企画立案元"
+                      name="plan_design">
                       <TextArea rows={2} 
                           name="plan_design"
                           placeholder="企画立案元は100文字以内で入力してください。" 
                           maxLength={100} 
-                          defaultValue={basicInfoDatas['plan_design']} 
                           onChange={handleTextAreaChange}/>
                     </Form.Item>
-                    <Form.Item label="企画立案背景">
+                    <Form.Item<FieldType>
+                      label="企画立案背景"
+                      name="plan_background">
                       <TextArea rows={2} 
                           name="plan_background"
                           placeholder="企画立案背景は300文字以内で入力してください。" 
                           maxLength={300} 
-                          defaultValue={basicInfoDatas['plan_background']} 
                           onChange={handleTextAreaChange}/>
                     </Form.Item>
-                    <Form.Item label="企画内容">
+                    <Form.Item<FieldType>
+                      label="企画内容"
+                      name="plan_content">
                       <TextArea rows={4} 
                           name="plan_content"
                           placeholder="企画内容は2000文字以内で入力してください。" 
                           maxLength={2000} 
-                          defaultValue={basicInfoDatas['plan_content']} 
                           onChange={handleTextAreaChange}/>
                     </Form.Item>
-                    <Form.Item label="添付書類">
+                    <Form.Item<FieldType>
+                      label="添付書類"
+                      name="attach_doc">
                       <TextArea rows={1} 
                           name="attach_doc"
                           placeholder="添付書類は150文字以内で入力してください。" 
                           maxLength={150} 
-                          defaultValue={basicInfoDatas['attach_doc']} 
                           onChange={handleTextAreaChange}/>
                     </Form.Item>
                     <Form.Item label="ドキュメント格納フォルダ">
                       
                     </Form.Item>
-                    <Form.Item label="備考">
+                    <Form.Item<FieldType>
+                      label="備考"
+                      name="remind">
                       <TextArea rows={1} 
                           name="remind"
                           placeholder="備考は300文字以内で入力してください。" 
                           maxLength={300} 
-                          defaultValue={basicInfoDatas['remind']} 
                           onChange={handleTextAreaChange}/>
                     </Form.Item>
-                    <Form.Item label="業務決裁用備考">
+                    <Form.Item<FieldType>
+                      label="業務決裁用備考"
+                      name="decision_remind">
                       <TextArea rows={1} 
                           name="decision_remind"
                           placeholder="業務決裁用備考は300文字以内で入力してください。" 
                           maxLength={300} 
-                          defaultValue={basicInfoDatas['decision_remind']} 
                           onChange={handleTextAreaChange}/>
                     </Form.Item>
-                    <Form.Item label="テレ朝チケット">
+                    <Form.Item<FieldType>
+                      label="テレ朝チケット"
+                      name="tv_asahi_ticket">
                       <TextArea rows={1} 
                         name="tv_asahi_ticket"
                         placeholder="テレ朝チケットは100文字以内で入力してください。" 
                         maxLength={100} 
-                        defaultValue={basicInfoDatas['tv_asahi_ticket']} 
                         onChange={handleTextAreaChange}/>
                     </Form.Item>
-                    <Form.Item label="協賛">
+                    <Form.Item<FieldType>
+                      label="協賛"
+                      name="sponsorship">
                       <TextArea rows={1} 
                           name="sponsorship"
                           placeholder="協賛は300文字以内で入力してください。" 
                           maxLength={300} 
-                          defaultValue={basicInfoDatas['sponsorship']} 
                           onChange={handleTextAreaChange}/>
                     </Form.Item>
-                    <Form.Item label="PR">
+                    <Form.Item<FieldType>
+                      label="PR"
+                      name="pr">
                       <TextArea rows={1} 
                           name="pr"
                           placeholder="PRは300文字以内で入力してください。" 
                           maxLength={300} 
-                          defaultValue={basicInfoDatas['pr']} 
                           onChange={handleTextAreaChange}/>
                     </Form.Item>
                   </div> 

@@ -32,7 +32,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                                 </NavLink>
                             </div>
                             <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <NavLink href={route('TBDC001.index')} active={route().current('TBDB001.index')}>
+                                <NavLink href={route('TBDC001.index')} active={route().current('TBDC001.index')}>
                                     イベント新規登録
                                 </NavLink>
                             </div>
