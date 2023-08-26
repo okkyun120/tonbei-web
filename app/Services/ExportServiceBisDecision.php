@@ -796,19 +796,19 @@ class ExportServiceBisDecision
 
 
         // 決裁用備考
-        $decision_remaind_buff = "";
-        if (!empty($sqlBaseData[0]->decision_remaind)) {
+        $decision_remind_buff = "";
+        if (!empty($sqlBaseData[0]->decision_remind)) {
             $item_no++;
 
-            $decision_remaind_buff = $item_no . ".備考　" . $sqlBaseData[0]->decision_remaind ;
+            $decision_remind_buff = $item_no . ".備考　" . $sqlBaseData[0]->decision_remind ;
 
-            $decision_remaind_buff .= "\n\n";
+            $decision_remind_buff .= "\n\n";
 
             if (!$first_page_write) {
-                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $decision_remaind_buff, LINE_STR_MAX);
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $decision_remind_buff, LINE_STR_MAX);
             }
             else {
-                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $decision_remaind_buff, LINE_STR_MAX2);
+                $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $decision_remind_buff, LINE_STR_MAX2);
             }
     
             // ページ最大値を超えているかチェック
@@ -820,14 +820,14 @@ class ExportServiceBisDecision
                     $write_buff = "";
                 
                     // 書込み行数再設定
-                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $decision_remaind_buff, LINE_STR_MAX2);
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $decision_remind_buff, LINE_STR_MAX2);
         
                     // １ページ目書込みフラグON
                     $first_page_write = true;
                 }
 
                 // バッファ格納
-                $write_buff .= $decision_remaind_buff;
+                $write_buff .= $decision_remind_buff;
             }
             else {
                 if ($write_line_cnt > PAGE_LINE_MAX2) {
@@ -837,11 +837,11 @@ class ExportServiceBisDecision
                     $write_buff = "";
                 
                     // 書込み行数再設定
-                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $decision_remaind_buff, LINE_STR_MAX2);    
+                    $write_line_cnt = NumberService::calculateNumberOfLines($write_buff . $decision_remind_buff, LINE_STR_MAX2);    
                 }
 
                 // バッファ格納
-                $write_buff .= $decision_remaind_buff;
+                $write_buff .= $decision_remind_buff;
             }
         }
 

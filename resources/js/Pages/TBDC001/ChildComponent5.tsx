@@ -9,6 +9,7 @@ import { Tabs, Row, Col, Modal, Form,  InputNumber, Input } from "antd";
 interface ChildProps {
   rowData: BalanceInfo;
   updateRowData: (newRowData: BalanceInfo) => void;
+  tv_asahi_investment: any;
 }
 
 //　収支情報インターフェース
@@ -37,26 +38,133 @@ interface BalanceInfo {
 }
 
 
-const ChildComponent5: React.FC<ChildProps> = ({ rowData, updateRowData }) => {
+const ChildComponent5: React.FC<ChildProps> = ({ rowData, updateRowData, tv_asahi_investment }) => {
 
   const [rows, setRows] = React.useState<BalanceInfo>(rowData);
 
   function handleInputChange(value: number | null, name: string) {
-    console.log('name : ', name);
-    console.log('value : ', value);
 
-  setRows((prevData) => ({
-    ...prevData,
-    [name]: value,
-  }));
+    console.log('tv_asahi_investment : ', tv_asahi_investment);
 
-  // updateRowData(rows);
+
+    setRows((prevData) => ({
+        ...prevData,
+        [name]: value,
+    }));
+
+    let calcName : string;
+    let calcValue : number;
+    let singleName  : string = "";
+    let calcSingle : number | null = null;
+    let singleBalanceName  : string = "";
+    let calcSingleBalance : number | null = null;
+
+    if ( value !== null ) {
+        switch(name) {
+            case "event_total_income":
+                calcName = "event_total_balance";
+                calcValue = value - rows["event_total_outgo"];
+                if (tv_asahi_investment !== null) {
+                    // 「テレビ朝日」の出資比率が設定されている場合
+                    // 単独収入および収支を更新する
+                    singleName = "single_income";
+                    calcSingle = Math.round(value * tv_asahi_investment / 100);
+
+                    singleBalanceName = "single_balance";
+                    calcSingleBalance = calcSingle - rows["single_outgo"];
+
+                }
+                break;
+            case "event_total_outgo":
+                calcName = "event_total_balance";
+                calcValue = rows["event_total_income"] - value;
+                if (tv_asahi_investment !== null) {
+                    // 「テレビ朝日」の出資比率が設定されている場合
+                    // 単独支出および収支を更新する
+                    singleName = "single_outgo";
+                    calcSingle = Math.round(value * tv_asahi_investment / 100);
+
+                    singleBalanceName = "single_balance";
+                    calcSingleBalance = rows["single_income"] - calcSingle;
+                }
+                break;
+            case "decision_total_income":
+                calcName = "decision_total_balance";
+                calcValue = value - rows["decision_total_outgo"];
+                if (tv_asahi_investment !== null) {
+                    // 「テレビ朝日」の出資比率が設定されている場合
+                    // 手数料抜き単独収入および収支を更新する
+                    singleName = "investment_income";
+                    calcSingle = Math.round(value * tv_asahi_investment /100);
+
+                    singleBalanceName = "investment_balance";
+                    calcSingleBalance = calcSingle - rows["investment_outgo"];
+                }
+                break;
+            case "decision_total_outgo":
+                calcName = "decision_total_balance";
+                calcValue = rows["decision_total_income"] - value;
+                if (tv_asahi_investment !== null) {
+                    // 「テレビ朝日」の出資比率が設定されている場合
+                    // 手数料抜き単独支出および収支を更新する
+                    singleName = "investment_outgo";
+                    calcSingle = Math.round(value * tv_asahi_investment /100);
+
+                    singleBalanceName = "investment_balance";
+                    calcSingleBalance = rows["investment_income"] - calcSingle;
+                }
+                break;
+            case "single_income":
+                calcName = "single_balance";
+                calcValue = value - rows["single_outgo"];
+                break;
+            case "single_outgo":
+                calcName = "single_balance";
+                calcValue = rows["single_income"] - value;
+                break;
+            case "investment_income":
+                calcName = "investment_balance";
+                calcValue = value - rows["investment_outgo"];
+                break;
+            case "investment_outgo":
+                calcName = "investment_balance";
+                calcValue = rows["investment_income"] - value;
+                break;
+            case "results_income":
+                calcName = "results_balance";
+                calcValue = value - rows["results_outgo"];
+                break;
+            case "results_outgo":
+                calcName = "results_balance";
+                calcValue = rows["results_income"] - value;
+                break;
+            }
+
+        console.log("singleName : ", singleName);
+
+        if (calcSingle !== null) {
+            setRows((prevData) => ({
+                ...prevData,
+                    [calcName]: calcValue,
+                    [singleName]: calcSingle,
+                    [singleBalanceName]: calcSingleBalance
+                })); 
+
+                console.log("calcSingle : ", calcSingle);
+                console.log("rows : ", rows);
+            }
+        else {
+            setRows((prevData) => ({
+            ...prevData,
+                [calcName]: calcValue,
+            }));
+        }
+    }
 }
 
 React.useEffect(() => {
-updateRowData(rows);
-console.log("rows : ", rows);
-
+    updateRowData(rows);
+    console.log("rows : ", rows);
 },[rows])
 
   // 収支データ存在チェック
@@ -96,10 +204,10 @@ console.log("rows : ", rows);
                 <Form.Item label="総収入" >
                     <InputNumber
                         name="event_total_income"
-                        value={rows.event_total_income}
                         style={{ width: 120 }}
                         min={0}
                         max={10000000000}
+                        value={rows["event_total_income"]}
                         onChange={(value) => handleInputChange(value, "event_total_income")}
                     />    
                 </Form.Item>
@@ -108,24 +216,25 @@ console.log("rows : ", rows);
                 <Form.Item label="総経費" >
                     <InputNumber
                         name="event_total_outgo"
-                        value={rows.event_total_outgo}
                         style={{ width: 120 }}
                         min={0}
                         max={10000000000}
+                        value={rows["event_total_outgo"]}
                         onChange={(value) => handleInputChange(value, "event_total_outgo")}
                     />    
                 </Form.Item>
             </Col>
             <Col span={6}>
             
-            <Form.Item label="総収支経費" >
+            <Form.Item label="総収支" >
                 <InputNumber
                     name="event_total_balance"
-                    value={rows.event_total_balance}
                     style={{ width: 120 }}
                     min={0}
                     max={10000000000}
+                    value={rows["event_total_balance"]}
                     onChange={(value) => handleInputChange(value, "event_total_balance")}
+                    disabled
                     />    
                 </Form.Item>
             </Col>
@@ -139,6 +248,7 @@ console.log("rows : ", rows);
                     style={{ width: 120 }}
                     min={0}
                     max={10000000000}
+                    value={rows["decision_total_income"]}
                     onChange={(value) => handleInputChange(value, "decision_total_income")}
                     />    
                 </Form.Item>
@@ -150,6 +260,7 @@ console.log("rows : ", rows);
                     style={{ width: 120 }}
                     min={0}
                     max={10000000000}
+                    value={rows["decision_total_outgo"]}
                     onChange={(value) => handleInputChange(value, "decision_total_outgo")}
                     />    
                 </Form.Item>
@@ -161,7 +272,9 @@ console.log("rows : ", rows);
                     style={{ width: 120 }}
                     min={0}
                     max={10000000000}
+                    value={rows["decision_total_balance"]}
                     onChange={(value) => handleInputChange(value, "decision_total_balance")}
+                    disabled
                     />    
                 </Form.Item>
             </Col>
@@ -175,6 +288,7 @@ console.log("rows : ", rows);
                     style={{ width: 120 }}
                     min={0}
                     max={10000000000}
+                    value={rows["single_income"]}                    
                     onChange={(value) => handleInputChange(value, "single_income")}
                     />    
                 </Form.Item>
@@ -184,6 +298,7 @@ console.log("rows : ", rows);
                 <InputNumber
                     name="single_outgo"
                     style={{ width: 120 }}
+                    value={rows["single_outgo"]}                    
                     min={0}
                     max={10000000000}
                     onChange={(value) => handleInputChange(value, "single_outgo")}
@@ -197,7 +312,9 @@ console.log("rows : ", rows);
                     style={{ width: 120 }}
                     min={0}
                     max={10000000000}
+                    value={rows["single_balance"]}
                     onChange={(value) => handleInputChange(value, "single_balance")}
+                    disabled
                     />    
                 </Form.Item>
             </Col>
@@ -210,7 +327,8 @@ console.log("rows : ", rows);
                     name="investment_income"
                     style={{ width: 120 }}
                     min={0}
-                    max={100}
+                    max={10000000000}
+                    value={rows["investment_income"]}                    
                     onChange={(value) => handleInputChange(value, "investment_income")}
                     />
                 </Form.Item>
@@ -222,6 +340,7 @@ console.log("rows : ", rows);
                     style={{ width: 120 }}
                     min={0}
                     max={10000000000}
+                    value={rows["investment_outgo"]}                    
                     onChange={(value) => handleInputChange(value, "investment_outgo")}
                     />
                 </Form.Item>
@@ -233,7 +352,9 @@ console.log("rows : ", rows);
                     style={{ width: 120 }}
                     min={0}
                     max={10000000000}
+                    value={rows["investment_balance"]}
                     onChange={(value) => handleInputChange(value, "investment_balance")}
+                    disabled
                     />
                 </Form.Item>
             </Col>
@@ -246,6 +367,7 @@ console.log("rows : ", rows);
                     style={{ width: 120 }}
                     min={0}
                     max={10000000000}
+                    value={rows["avg_unit_price"]}
                     onChange={(value) => handleInputChange(value, "avg_unit_price")}
                     />
                 </Form.Item>
@@ -260,6 +382,7 @@ console.log("rows : ", rows);
                     style={{ width: 120 }}
                     min={0}
                     max={100}
+                    value={rows["break_even"]}
                     onChange={(value) => handleInputChange(value, "break_even")}
                     />
                 </Form.Item>
@@ -275,6 +398,7 @@ console.log("rows : ", rows);
                     style={{ width: 120 }}
                     min={0}
                     max={10000000000}
+                    value={rows["results_income"]}
                     onChange={(value) => handleInputChange(value, "results_income")}
                     />
                 </Form.Item>
@@ -286,6 +410,7 @@ console.log("rows : ", rows);
                     style={{ width: 120 }}
                     min={0}
                     max={10000000000}
+                    value={rows["results_outgo"]}
                     onChange={(value) => handleInputChange(value, "results_outgo")}
                     />
                 </Form.Item>
@@ -297,6 +422,7 @@ console.log("rows : ", rows);
                     style={{ width: 120 }}
                     min={0}
                     max={10000000000}
+                    value={rows["results_balance"]}
                     onChange={(value) => handleInputChange(value, "results_balance")}
                     />
                 </Form.Item>
@@ -310,6 +436,7 @@ console.log("rows : ", rows);
                     style={{ width: 120 }}
                     min={0}
                     max={10000000000}
+                    value={rows["results_sales_goods"]}
                     onChange={(value) => handleInputChange(value, "results_sales_goods")}
                     />
                 </Form.Item>
@@ -323,6 +450,7 @@ console.log("rows : ", rows);
                     style={{ width: 120 }}
                     min={0}
                     max={100}
+                    value={rows["results_goods_profit_rate"]}
                     onChange={(value) => handleInputChange(value, "results_goods_profit_rate")}
                     />
                 </Form.Item>
@@ -332,8 +460,5 @@ console.log("rows : ", rows);
         </div>
       );
     }
-    
-
-
 
 export default ChildComponent5;

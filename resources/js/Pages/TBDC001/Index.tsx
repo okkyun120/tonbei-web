@@ -897,6 +897,16 @@ export default function Index( props: any ) {
     console.log('Failed:', errorInfo);
   };
 
+  const getPercentTV_AsahiInvestment = () => {
+    if (investmentInfoDatas !== undefined) {
+      const item = investmentInfoDatas.find(item => item.client_cd === 1);
+      return item ? item["investment_percent"] : null;
+    }
+    else
+      return null;
+  };
+
+  console.log("getPercentTV_AsahiInvestment", getPercentTV_AsahiInvestment);
 
    return (
     <AuthenticatedLayout
@@ -1341,7 +1351,9 @@ export default function Index( props: any ) {
                       <CustomTabPanel value={valueTab} index={4}>
                         <ChildComponent5
                           rowData={balanceInfoDatas || []}
-                          updateRowData={updateBalanceRowData} />
+                          updateRowData={updateBalanceRowData}
+                          tv_asahi_investment ={getPercentTV_AsahiInvestment()}
+                           />
                       </CustomTabPanel>
                       <CustomTabPanel value={valueTab} index={5}>
                         <ChildComponent6

@@ -1166,7 +1166,16 @@ export default function Index( props: any ) {
   };
 
 
-   return (
+
+  const getPercentTV_AsahiInvestment = () => {
+
+    const item = investmentInfoDatas.find(item => item.client_cd === 1);
+
+    return item ? item["investment_percent"] : null;
+  };
+
+
+  return (
     <AuthenticatedLayout
     user={user}
     header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">イベント登録</h2>}>
@@ -1641,7 +1650,7 @@ export default function Index( props: any ) {
                         <ChildComponent4 rowData={relationInfoDatas} updateRowData={updateRelationRowData} />
                       </CustomTabPanel>
                       <CustomTabPanel value={valueTab} index={4}>
-                        <ChildComponent5 rowData={balanceInfoDatas} updateRowData={updateBalanceRowData} />
+                        <ChildComponent5 rowData={balanceInfoDatas} updateRowData={updateBalanceRowData} tv_asahi_investment ={getPercentTV_AsahiInvestment()} />
                       </CustomTabPanel>
                       <CustomTabPanel value={valueTab} index={5}>
                         <ChildComponent6 rowData={chartInfoDatas} updateRowData={updateChartRowData} />                        
